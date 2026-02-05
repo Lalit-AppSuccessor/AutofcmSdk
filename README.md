@@ -29,7 +29,9 @@ pubspec.yaml
 
 dependencies:
   autofcm_sdk:
-    path: ../sdk
+    git:
+      url: https://github.com/Lalit-AppSuccessor/AutofcmSdk.git
+      ref: main
 
   firebase_core: any
   firebase_messaging: any
