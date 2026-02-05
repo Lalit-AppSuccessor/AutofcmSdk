@@ -5,7 +5,7 @@ class ApiClient {
   final String appId;
   ApiClient(this.appId);
 
-  static const baseUrl = "http://pingautobe.boostproductivity.online";
+  static const baseUrl = "https://pingautobe.boostproductivity.online";
 
   Future<void> callAppInstall({
     required String afId,
