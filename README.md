@@ -80,6 +80,8 @@ dependencies {
 
 STEP 4 – INITIALIZE SDK (REQUIRED)
 
+(IMP) - Provide userid in the appsflyer sdk when app initializes.
+
 main.dart
 
 const String appId = "com.test.app.id";
