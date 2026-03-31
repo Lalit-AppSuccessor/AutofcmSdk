@@ -1,4 +1,6 @@
 import '../notification/notification_listener.dart';
+import '../inapp/in_app_notification_manager.dart';
+import 'network_manager.dart';
 import 'storage.dart';
 import 'api_client.dart';
 import 'register_loop.dart';
@@ -23,8 +25,12 @@ class SdkManager {
     Logger.log("SDK init started");
 
     await Storage.init();
+    await NetworkManager().init();
+
+    InAppNotificationManager.instance.init(_appId);
     LifecycleObserver.attach(this);
-    await NotificationListener.init(_appId);
+    await FcmNotificationListener.init(_appId);
+    InAppNotificationManager.instance.onAppResumed();
     _evaluateState();
   }
 
@@ -73,6 +79,7 @@ class SdkManager {
   /// Lifecycle hooks
   void onAppResumed() {
     Logger.log("App resumed");
+    InAppNotificationManager.instance.onAppResumed();
     _evaluateState();
   }
 

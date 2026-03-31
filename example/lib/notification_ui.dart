@@ -31,6 +31,9 @@ class NotificationUI {
       'sdk Test',
       importance: Importance.max,
       priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap(
+        'logo',
+      ), // add the logo file name
     );
 
     await _plugin.show(

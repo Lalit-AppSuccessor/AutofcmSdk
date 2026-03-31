@@ -23,7 +23,7 @@ class NotificationClickHandler {
 
     Logger.log("Firing API-C (notification-clicked) | is_open=$isOpen");
 
-    final api = ApiClient(appId); // ✅ FIXED
+    final api = ApiClient(appId); 
     await api.callNotificationClicked(
       notificationId: notificationId,
       userAfId: userAfId,

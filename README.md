@@ -1,251 +1,381 @@
-AUTOFCM FLUTTER SDK – SIMPLE INTEGRATION GUIDE
+# AutoFCM SDK
 
-PURPOSE
+> **Flutter SDK for Firebase Cloud Messaging automation with in-app notification modals and campaign tracking**
 
-This SDK automatically handles:
-• App install tracking
-• Device heartbeat (foreground only)
-• Notification click tracking (foreground / background / killed)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/Lalit-AppSuccessor/AutoFcm-backend)
+[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.7.0-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-%3E%3D2.18.0-0175C2?logo=dart)](https://dart.dev)
 
-App developers only need to provide minimal inputs.
+---
 
-REQUIREMENTS
+## 🎯 Overview
 
-• Flutter 3.x
-• Android app
-• Firebase configured
-• Firebase Cloud Messaging enabled
+AutoFCM SDK automates Firebase Cloud Messaging integration with:
 
-Required packages:
-• firebase_core
-• firebase_messaging
-• flutter_local_notifications
-• shared_preferences
+- **Automated Tracking** - Install, heartbeat, and click analytics
+- **In-App Modals** - Rich notification dialogs within your app
+- **Campaign Management** - Foreground/background state detection
+- **Zero Backend Work** - SDK handles all API calls
 
+---
 
-STEP 1 – ADD SDK DEPENDENCY
+## ✨ Features
 
-pubspec.yaml
+| Feature             | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| 🔔 In-App Modals    | Customizable notification dialogs in-app        |
+| 📊 Auto Tracking    | Install, heartbeat, and click analytics         |
+| 🎨 Customizable     | Full styling control (colors, borders, padding) |
+| 🔄 State Aware      | Handles foreground, background, killed states   |
+| 🚀 Campaign Ready   | Deduplication and ID-based tracking             |
+| ⚡ Easy Integration | Minimal code, works with existing Firebase      |
 
+---
+
+## 📦 Prerequisites
+
+```yaml
+dependencies:
+  firebase_core: any
+  firebase_messaging: ^15.0.0
+  flutter_local_notifications: any
+  shared_preferences: ^2.2.2
+  url_launcher: ^6.2.0
+```
+
+**Requirements:**
+
+- Flutter 3.7.0+ / Dart 2.18.0+
+- Android minSdk 21 / iOS 11.0+
+- Firebase project with FCM enabled
+
+---
+
+## 🔧 Installation
+
+```yaml
 dependencies:
   autofcm_sdk:
+    path: ../AutofcmSdk # Local path
+    # OR
     git:
-      url: https://github.com/Lalit-AppSuccessor/AutofcmSdk.git
-      ref: main
+      url: https://github.com/Lalit-AppSuccessor/AutoFcm-backend.git
+```
 
-  firebase_core: any
-  firebase_messaging: any
-  flutter_local_notifications: any
-  shared_preferences: any
-
-Run:
+```bash
 flutter pub get
+```
 
+---
 
-STEP 2 – FIREBASE SETUP (MANDATORY)
+## 🚀 Quick Start
 
-Place google-services.json in:
-android/app/google-services.json
-
-Enable Firebase Messaging in Firebase Console
-
-AndroidManifest.xml:
-Inside <application> tag, add:
-
-<meta-data
-  android:name="com.google.firebase.messaging.default_notification_channel_id"
-  android:value="autofcm_default_channel" />
-
-
-STEP 3 – ANDROID BUILD FIX (IMPORTANT)
-
-If you use flutter_local_notifications:
-
-android/app/build.gradle.kts
-
-Inside compileOptions:
-
-compileOptions {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-  isCoreLibraryDesugaringEnabled = true
-}
-
-Add dependency:
-
-dependencies {
-  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-}
-
-
-STEP 4 – INITIALIZE SDK (REQUIRED)
-
-(IMP) - Provide userid in the appsflyer sdk when app initializes.
-
-main.dart
-
-const String appId = "com.test.app.id";
-const String uidKey = "autofcm_uid_$appId";
-
+```dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+  // Initialize SDK
   await AutofcmSdk.init(
-    appId: appId,
+    appId: 'com.your.app',
     debug: true,
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
+// Set AppsFlyer ID when available
+AutofcmSdk.setAfId(appsFlyerUID);
 
-STEP 5 – PROVIDE AF ID (REQUIRED)
+// Notify on login/logout
+AutofcmSdk.notifyUserUpdated();
+```
 
-SDK does NOT fetch AF ID automatically.
+---
 
-App MUST provide AF ID when available.
+## 📚 Implementation Guide
 
-Example:
+### Step 1: Firebase Setup
 
-AutofcmSdk.setAfId("your_af_id_here");
+**Android** (`android/app/src/main/AndroidManifest.xml`):
 
-This can be:
-• Immediate
-• Delayed
-• After AppsFlyer initializes
+```xml
+<application>
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="autofcm_default_channel" />
+</application>
+```
 
-SDK will auto-react.
+**Android Build** (`android/app/build.gradle`):
 
+```gradle
+android {
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
+}
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+}
+```
 
-STEP 6 – USER LOGIN / LOGOUT
+**iOS** - Add `GoogleService-Info.plist` and enable Push Notifications in Xcode.
 
-On login:
+---
 
-await prefs.setString(
-  "autofcm_uid_com.your.app.package",
-  "user_123",
+### Step 2: SDK Initialization
+
+```dart
+const String appId = "com.your.app";
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await AutofcmSdk.init(appId: appId, debug: true);
+
+  runApp(const MyApp());
+}
+```
+
+---
+
+### Step 3: AppsFlyer Integration
+
+```dart
+// After AppsFlyer initializes
+final uid = await appsFlyerSdk.getAppsFlyerUID();
+AutofcmSdk.setAfId(uid ?? '');
+```
+
+---
+
+### Step 4: User Authentication
+
+**On Login:**
+
+```dart
+final prefs = await SharedPreferences.getInstance();
+await prefs.setString('autofcm_uid_$appId', userId);
+AutofcmSdk.notifyUserUpdated();
+```
+
+**On Logout:**
+
+```dart
+await prefs.remove('autofcm_uid_$appId');
+AutofcmSdk.notifyUserUpdated();
+```
+
+---
+
+### Step 5: Foreground Notifications
+
+Create `lib/notification_ui.dart` or replace with the example `notification_ui.dart` file.
+
+**Initialize in main:**
+
+```dart
+await NotificationUI.init(
+  onClick: (payload) => AutofcmSdk.handleNotificationClick(payload),
 );
-AutofcmSdk.notifyUserUpdated();
+```
 
-On logout:
+**Handle foreground messages:**
 
-await prefs.remove("autofcm_uid_com.your.app.package");
-AutofcmSdk.notifyUserUpdated();
-
-SDK behavior:
-• Starts heartbeat loop on login
-• Stops loop on logout or background
-
-
-STEP 7 – FOREGROUND NOTIFICATION DISPLAY
-
-Android does NOT show system notifications in foreground.
-
-You MUST show a local notification.
-
-Create file:
-
-lib/notification_ui.dart
-
-(Use flutter_local_notifications to show notification)
-
-
-STEP 8 – FOREGROUND FCM HANDLING
-
-main.dart
-
+```dart
 FirebaseMessaging.onMessage.listen((message) {
+  if (message.data['type'] == 'in_app') return; // SDK handles
   NotificationUI.show(
-    title: message.notification?.title ?? "Notification",
-    body: message.notification?.body ?? "",
+    title: message.notification?.title ?? '',
+    body: message.notification?.body ?? '',
     payload: message.data,
   );
 });
+```
 
+---
 
-STEP 9 – NOTIFICATION CLICK HANDLING
+### Step 6: In-App Notifications
 
-When a local notification is clicked, call:
+**Backend Payload:**
 
-AutofcmSdk.handleNotificationClick(payloadString);
-
-Like this before app run:
-
-// 🔔 Init local notification UI
-  await NotificationUI.init(
-    onClick: (payload) {
-      AutofcmSdk.handleNotificationClick(payload);
-    },
-  );
-  ;
-
-DO NOT call backend APIs manually.
-
-SDK will:
-• Detect foreground vs background
-• Deduplicate clicks
-• Fire API automatically
-
-
-NOTIFICATION CLICK API (AUTO)
-
-Endpoint:
-POST /datatrack/notification-clicked
-
-Payload sent by SDK:
-
+```json
 {
-  "notification_id": "...",
-  "user_afid": "...",
-  "is_open": true | false
+  "token": "<token>",
+  "data": {
+    "type": "in_app",
+    "notification_id": "campaign_123",
+    "inapp_title": "New Feature!",
+    "inapp_body": "Check out what's new",
+    "inapp_image_url": "https://example.com/image.jpg",
+    "inapp_cta_text": "Explore",
+    "inapp_cta_url": "https://example.com/feature"
+  }
 }
+```
 
-is_open = true
-→ Notification clicked while app already open
+**Wrap your screen:**
 
-is_open = false
-→ Notification opened app from background or killed
+```dart
+import 'package:autofcm_sdk/autofcm_sdk.dart';
 
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AutofcmInAppScope(
+      config: const InAppModalConfig(
+        backgroundColor: Color(0xFF1E1E2E),
+        ctaButtonColor: Color(0xFF6C63FF),
+        borderRadius: 20,
+      ),
+      onCtaPressed: (url) async {
+        await launchUrl(Uri.parse(url));
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Home')),
+        body: YourContent(),
+      ),
+    );
+  }
+}
+```
 
-WHAT APP DEVELOPER MUST DO
+---
 
-✓ Initialize Firebase
-✓ Initialize SDK
-✓ Provide AF ID
-✓ Notify SDK on login/logout
-✓ Show foreground notification UI
-✓ Forward notification click to SDK
+## 📖 API Reference
 
+### AutofcmSdk
 
-WHAT APP DEVELOPER SHOULD NOT DO
+```dart
+// Initialize SDK
+await AutofcmSdk.init({required String appId, bool debug = false});
 
-✗ Call backend APIs
-✗ Deduplicate events
-✗ Detect app state manually
-✗ Import SDK internal files
+// Set AppsFlyer ID
+AutofcmSdk.setAfId(String afId);
 
+// Notify user changes
+AutofcmSdk.notifyUserUpdated();
 
-DEBUGGING
+// Handle notification clicks
+AutofcmSdk.handleNotificationClick(String payload);
 
-Enable logs:
-debug: true in SDK init
+// Manual in-app check (advanced)
+await AutofcmSdk.registerInAppScreen(
+  BuildContext context,
+  {InAppModalConfig config, Function(String)? onCtaPressed}
+);
+```
 
-Logs will appear as:
-[AutoFcmSDK] ...
+### AutofcmInAppScope
 
+```dart
+AutofcmInAppScope({
+  required Widget child,
+  InAppModalConfig config = const InAppModalConfig(),
+  void Function(String url)? onCtaPressed,
+})
+```
 
-COMMON ISSUES
+### InAppModalConfig
 
-Notification not visible:
-• Missing local notification UI
+```dart
+const InAppModalConfig({
+  Color backgroundColor,      // Card background
+  Color barrierColor,         // Overlay color
+  Color ctaButtonColor,       // Button background
+  Color ctaTextColor,         // Button text
+  Color titleColor,           // Title text
+  Color bodyColor,            // Body text
+  Color closeIconColor,       // Close icon
+  double borderRadius,        // Corner radius
+  EdgeInsets insetPadding,    // Screen margins
+})
+```
 
-Click not tracked:
-• payload missing notification_id or user_afid
-• handleNotificationClick not called
+---
 
-Android build error:
-• Enable coreLibraryDesugaring
+## 🎨 In-App Notification Flow
 
+```
+Backend → SDK Listener → Storage (SharedPreferences) → AutofcmInAppScope → Modal Display
+```
 
-END OF FILE
+**Behavior:**
+
+- Same `notification_id` shown only once
+- Latest notification overwrites pending ones
+- Works in foreground, background, and killed states
+- Modal displays when user navigates to designated screen
+
+---
+
+## 🔍 Troubleshooting
+
+### In-App Modal Not Showing
+
+- Check `type: "in_app"` in FCM payload
+- Verify `AutofcmInAppScope` is on the screen
+- Enable debug logs: `debug: true`
+- Try different `notification_id`
+
+### Foreground Notifications Missing
+
+- Verify `FirebaseMessaging.onMessage` listener
+- Check notification channel creation
+- Skip in-app types: `if (data['type'] == 'in_app') return;`
+
+### Click Tracking Issues
+
+- Ensure `handleNotificationClick()` is called
+- Check payload has `notification_id` and `user_afid`
+
+### Android Build Errors
+
+- Enable desugaring in `build.gradle`
+- Add `coreLibraryDesugaring` dependency
+
+---
+
+## 📁 File Structure
+
+```
+lib/
+├── autofcm_sdk.dart              # Public API
+├── inapp/                        # In-app system
+│   ├── in_app_modal_widget.dart
+│   ├── in_app_scope_widget.dart
+│   └── in_app_notification_*
+├── notification/                 # FCM & tracking
+│   ├── notification_listener.dart
+│   └── notification_click_handler.dart
+└── src/                          # Core
+    ├── sdk_manager.dart
+    ├── api_client.dart
+    └── lifecycle_observer.dart
+```
+
+---
+
+## 🤝 Support
+
+- **Homepage**: [https://pingautobe.boostproductivity.online/](https://pingautobe.boostproductivity.online/)
+- **Repository**: [https://github.com/Lalit-AppSuccessor/AutoFcm-backend](https://github.com/Lalit-AppSuccessor/AutoFcm-backend)
+
+---
+
+## 📝 Changelog
+
+**v1.1.0**
+
+- In-app notification modals
+- Network monitoring
+- Comprehensive docs
+
+**v1.0.0**
+
+- Initial release
+
+---
+
+**Built with ❤️ for Flutter developers**

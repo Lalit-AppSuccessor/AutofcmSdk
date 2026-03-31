@@ -4,26 +4,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autofcm_sdk/autofcm_sdk.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'notification_ui.dart';
+import 'logger.dart';
+import 'utils.dart';
 
-const String appId = "com.journalit.notebook.diaryapp";
+const String appId = "com.example.journalit_test_app";
 const String uidKey = "autofcm_uid_$appId";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
 
-  // 🔔 Init local notification UI
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
+
+  // 🔔 Init local notification UI (unchanged)
   await NotificationUI.init(
     onClick: (payload) {
       AutofcmSdk.handleNotificationClick(payload);
     },
   );
-  ;
 
-  // 🔥 Listen for FCM when app is FOREGROUND
-  FirebaseMessaging.onMessage.listen((message) {
-    print("🔥 FOREGROUND FCM → SHOWING NOTIFICATION UI");
+  FirebaseMessaging.onMessage.listen((message) async {
+    final data = Map<String, dynamic>.from(message.data);
+    if (data['type'] == 'in_app') return;
 
+    Logger.log("🔥 FOREGROUND FCM → SHOWING NOTIFICATION UI");
     NotificationUI.show(
       title: message.notification?.title ?? "Test Notification",
       body: message.notification?.body ?? "You received a message",
@@ -31,30 +36,22 @@ void main() async {
     );
   });
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("🔥 FCM RECEIVED IN FOREGROUND");
-    print("📦 message.data = ${message.data}");
-    print("🔔 message.notification = ${message.notification}");
-    print("🧩 full message = $message");
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    final data = Map<String, dynamic>.from(message.data);
+    Logger.log("🟢 NOTIFICATION CLICKED (BACKGROUND)");
+    Logger.log("📦 payload = $data");
   });
 
-  // App opened from BACKGROUND by notification click
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print("🟢 NOTIFICATION CLICKED (BACKGROUND)");
-    print("📦 payload = ${message.data}");
-  });
-
-  // App opened from KILLED state by notification click
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-
   if (initialMessage != null) {
-    print("🟢 NOTIFICATION CLICKED (KILLED)");
-    print("📦 payload = ${initialMessage.data}");
+    final data = Map<String, dynamic>.from(initialMessage.data);
+    Logger.log("🟢 NOTIFICATION CLICKED (KILLED)");
+    Logger.log("📦 payload = $data");
   }
 
   await AutofcmSdk.init(appId: appId, debug: true);
-  Future.delayed(const Duration(seconds: 8), () {
-    AutofcmSdk.setAfId("test_af_delayed_002");
+  Future.delayed(const Duration(seconds: 1), () {
+    AutofcmSdk.setAfId("test_af");
   });
   runApp(const MyApp());
 }
@@ -106,19 +103,29 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Journalit SDK Test")),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text("UID: ${uid ?? "NOT LOGGED IN"}"),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: const Text("Login")),
-            ElevatedButton(onPressed: _logout, child: const Text("Logout")),
-            const SizedBox(height: 20),
-            const Text("Keep app in foreground to see API-B every 1 min"),
-          ],
+    return AutofcmInAppScope(
+      config: const InAppModalConfig(
+        backgroundColor: Colors.white,
+        ctaButtonColor: Color(0xFFC5D6D0),
+        titleColor: Colors.black,
+        bodyColor: Color(0x80000000),
+        borderRadius: 32,
+      ),
+
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Journalit SDK Test")),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Text("UID: ${uid ?? "NOT LOGGED IN"}"),
+              const SizedBox(height: 20),
+              ElevatedButton(onPressed: _login, child: const Text("Login")),
+              ElevatedButton(onPressed: _logout, child: const Text("Logout")),
+              const SizedBox(height: 20),
+              const Text("Keep app in foreground to see API-B every 1 min"),
+            ],
+          ),
         ),
       ),
     );

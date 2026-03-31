@@ -1,7 +1,10 @@
 name: autofcm_sdk
-description: >
-  AutoFCM SDK for in-app notification & FCM automation
-version: 1.0.0
+description: AutoFCM SDK for in-app modal notifications, FCM handling, and campaign automation
+version: 1.1.0
+
+homepage: https://pingautobe.boostproductivity.online/
+repository: https://github.com/Lalit-AppSuccessor/AutoFcm-backend
+
 environment:
   sdk: ">=2.18.0 <4.0.0"
   flutter: ">=3.7.0"
@@ -10,9 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-  http: ^1.1.0
+  http: ^1.2.0
   shared_preferences: ^2.2.2
   firebase_messaging: ">=14.0.0 <17.0.0"
+  url_launcher: ^6.2.5
+  connectivity_plus: ^6.0.3
 
 dev_dependencies:
   flutter_lints: ^3.0.0
