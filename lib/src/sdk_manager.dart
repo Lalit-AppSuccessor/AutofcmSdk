@@ -23,9 +23,15 @@ class SdkManager {
     Logger.log("SDK init started");
 
     await Storage.init();
+    Logger.log("storage init started");
     LifecycleObserver.attach(this);
+    Logger.log("lifecycle init started");
+
     await NotificationListener.init(_appId);
+    Logger.log("notification listener init started");
+
     _evaluateState();
+    Logger.log("storage init completed");
   }
 
   /// Central brain of the SDK
