@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../src/logger.dart';
 import 'notification_click_handler.dart';
 
 class NotificationListener {
@@ -7,10 +8,20 @@ class NotificationListener {
   static late String _appId;
 
   static Future<void> init(String appId) async {
+    Logger.log("notify entered stage 0");
     if (_initialized) return;
     _initialized = true;
     _appId = appId;
 
+    Logger.log("notify entered stage 1");
+
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    Logger.log("notify permission given");
     // Background click
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       NotificationClickHandler.handle(
@@ -19,6 +30,7 @@ class NotificationListener {
         isOpen: false,
       );
     });
+    Logger.log("notify message openhandled stage 2");
 
     // Killed click
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
@@ -33,6 +45,7 @@ class NotificationListener {
 
   // Foreground click (local notification)
   static void handleForegroundClick(String payload) {
+    Logger.log("notifiy foreground stage 1");
     try {
       final decoded = jsonDecode(payload);
       if (decoded is Map<String, dynamic>) {
