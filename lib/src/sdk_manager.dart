@@ -31,7 +31,7 @@ class SdkManager {
     Logger.log("notification listener init started");
 
     _evaluateState();
-    Logger.log("storage init completed");
+    Logger.log("_evaluateState init started");
   }
 
   /// Central brain of the SDK
