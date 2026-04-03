@@ -33,13 +33,20 @@ class NotificationListener {
     Logger.log("notify message openhandled stage 2");
 
     // Killed click
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
-      NotificationClickHandler.handle(
-        payload: initialMessage.data,
-        appId: _appId,
-        isOpen: false,
-      );
+    try {
+      final initialMessage = await FirebaseMessaging.instance
+          .getInitialMessage();
+      Logger.log("notify killed stage");
+      if (initialMessage != null) {
+        NotificationClickHandler.handle(
+          payload: initialMessage.data,
+          appId: _appId,
+          isOpen: false,
+        );
+      }
+      Logger.log("All done");
+    } catch (e) {
+      Logger.log("Error in notification listener init: $e");
     }
   }
 
