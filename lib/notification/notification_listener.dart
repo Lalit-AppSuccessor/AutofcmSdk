@@ -13,6 +13,8 @@ class FcmNotificationListener {
     _initialized = true;
     _appId = appId;
 
+    Logger.log("NotificationListener message open handled");
+
     // ── Background click ─────────────────────────────────────────
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       _maybeHandleInApp(message.data);
@@ -26,7 +28,17 @@ class FcmNotificationListener {
     });
 
     // ── Killed-state click ───────────────────────────────────────
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    final initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage()
+        .timeout(
+          const Duration(seconds: 3),
+          onTimeout: () {
+            Logger.log("getInitialMessage timeout");
+            return null;
+          },
+        );
+    Logger.log("getInitialMessage killed handled");
+
     if (initialMessage != null) {
       _maybeHandleInApp(initialMessage.data);
 

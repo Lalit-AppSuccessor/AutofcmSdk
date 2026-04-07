@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autofcm_sdk/autofcm_sdk.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'notification_ui.dart';
+import 'main.dart';
 
 Future<void> printAllPrefs() async {
   final prefs = await SharedPreferences.getInstance();
@@ -26,10 +26,9 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage message) async {
 
   if (data['type'] == 'in_app') {
     Logger.log("💾 BG saving in-app payload");
-    await AutofcmSdk.saveInAppForLater(
-      appId: "com.example.journalit_test_app",
-      data: data,
-    );
+
+    // assign the appid here
+    await AutofcmSdk.saveInAppForLater(appId: appId, data: data);
     Logger.log("✅ BG save complete");
     await printAllPrefs();
   }

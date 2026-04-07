@@ -12,6 +12,7 @@ import 'inapp/in_app_notification_data.dart';
 // ── Public re-exports ──────────────────────────────────────────────────────
 export 'inapp/in_app_modal_widget.dart' show InAppModalConfig;
 export 'inapp/in_app_scope_widget.dart' show AutofcmInAppScope;
+export 'inapp/in_app_modal_widget.dart' show ModalLayoutTemplate;
 
 class AutofcmSdk {
   static Future<void> init({required String appId, bool debug = false}) async {
