@@ -1,5 +1,4 @@
 import 'logger.dart';
-// import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autofcm_sdk/autofcm_sdk.dart';
@@ -26,8 +25,6 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage message) async {
 
   if (data['type'] == 'in_app') {
     Logger.log("💾 BG saving in-app payload");
-
-    // assign the appid here
     await AutofcmSdk.saveInAppForLater(appId: appId, data: data);
     Logger.log("✅ BG save complete");
     await printAllPrefs();

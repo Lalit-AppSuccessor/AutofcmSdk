@@ -27,14 +27,10 @@ class NotificationUI {
     required Map<String, dynamic> payload,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'sdk_test_channel',
-      'sdk Test',
-      importance: Importance.max,
-      priority: Priority.high,
-      largeIcon: DrawableResourceAndroidBitmap(
-        'logo',
-      ), // add the logo file name
-    );
+        'sdk_test_channel', 'sdk Test',
+        importance: Importance.max,
+        priority: Priority.high,
+        largeIcon: DrawableResourceAndroidBitmap('logo'));
 
     await _plugin.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,

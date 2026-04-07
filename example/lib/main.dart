@@ -10,6 +10,15 @@ import 'utils.dart';
 const String appId = "com.example.journalit_test_app";
 const String uidKey = "autofcm_uid_$appId";
 
+// Future<void> printAllPrefs() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   final keys = prefs.getKeys();
+//   for (String key in keys) {
+//     final value = prefs.get(key);
+//     print('$key: $value');
+//   }
+// }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -105,13 +114,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return AutofcmInAppScope(
       config: const InAppModalConfig(
-        backgroundColor: Colors.white,
-        ctaButtonColor: Color(0xFFC5D6D0),
-        titleColor: Colors.black,
-        bodyColor: Color(0x80000000),
-        borderRadius: 32,
-      ),
-
+        template: ModalLayoutTemplate.imageCard,
+      ), // replace with "simple" for journalit style
       child: Scaffold(
         appBar: AppBar(title: const Text("Journalit SDK Test")),
         body: Padding(

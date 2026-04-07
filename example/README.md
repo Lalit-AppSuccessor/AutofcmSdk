@@ -335,17 +335,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutofcmInAppScope(
-      config: const InAppModalConfig(
-        backgroundColor: Color(0xFF1E1E2E),
-        ctaButtonColor: Color(0xFF6C63FF),
-        borderRadius: 20,
+      config:  const InAppModalConfig(
+        template: ModalLayoutTemplate.imageCard,     // replace with "simple" for journalit style
       ),
-      onCtaPressed: (url) async {
-        final uri = Uri.parse(url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-        }
-      },
       child: Scaffold(
         appBar: AppBar(title: const Text('Home')),
         body: const YourContent(),
