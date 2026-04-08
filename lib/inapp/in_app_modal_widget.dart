@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'in_app_notification_data.dart';
 
@@ -96,12 +97,22 @@ class InAppModal extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       barrierColor: config.barrierColor,
-      builder: (_) => InAppModal.fromTemplate(
-        template: config.template,
-        data: data,
-        onDismiss: onDismiss,
-        config: config,
-        onCtaPressed: onCtaPressed,
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: Colors.white.withOpacity(0)),
+            ),
+          ),
+          InAppModal.fromTemplate(
+            template: config.template,
+            data: data,
+            onDismiss: onDismiss,
+            config: config,
+            onCtaPressed: onCtaPressed,
+          ),
+        ],
       ),
     );
   }
